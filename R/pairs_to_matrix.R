@@ -48,6 +48,14 @@ pairs_to_matrix <- function(df) {
   # get formula for dMcast
   f <- stats::as.formula(paste(names(df)[1:2], collapse= " ~ "))
 
+  if(!is.factor(df[,1])) {
+      df[,1] <- factor(df[,1])
+  }
+  
+  if(!is.factor(df[,2])) {
+      df[,2] <- factor(df[,2])
+  }
+  
   # create cross-tabs matrix (not square)
   mat <- Matrix.utils::dMcast(df, f, value.var = names(df)[3], as.factors = TRUE)
 
@@ -61,14 +69,16 @@ pairs_to_matrix <- function(df) {
   # add in zeros for missing rows
   if (nrow(mat) < n) {
     new_rows <- Matrix::Matrix(0, n - nrow(mat), ncol(mat),
-                       dimnames = list(base::setdiff(players, rownames(mat)), colnames(mat)))
+                       dimnames = list(base::setdiff(players, rownames(mat)),
+                                       colnames(mat)))
     mat <- rbind(mat, new_rows)
   }
 
   # add in zeros for missing columns
   if (ncol(mat) < n) {
     new_cols <- Matrix::Matrix(0, n, n - ncol(mat),
-                       dimnames = list(rownames(mat), base::setdiff(players, colnames(mat))))
+                       dimnames = list(rownames(mat), 
+                                       base::setdiff(players, colnames(mat))))
     mat <- cbind(mat, new_cols)
   }
 
@@ -85,14 +95,16 @@ pairs_to_matrix <- function(df) {
     # add in zeros for missing rows
     if (nrow(mat2) < n) {
       new_rows2 <- Matrix::Matrix(0, n - nrow(mat2), ncol(mat2),
-                          dimnames = list(base::setdiff(players, rownames(mat2)), colnames(mat2)))
+                          dimnames = list(base::setdiff(players, rownames(mat2)),
+                                          colnames(mat2)))
       mat2 <- rbind(mat2, new_rows2)
     }
 
     # add in zeros for missing columns
     if (ncol(mat2) < n) {
-      new_cols2 <- Matrix::Matrix(0, n, n - ncol(mat2),
-                          dimnames = list(rownames(mat2), base::setdiff(players, colnames(mat2))))
+      new_cols2 <- Matrix::Matrix(0, n, n - ncol(mat2), 
+                                  dimnames = list(rownames(mat2), 
+                                                  base::setdiff(players, colnames(mat2))))
       mat2 <- cbind(mat2, new_cols2)
     }
 
@@ -104,7 +116,9 @@ pairs_to_matrix <- function(df) {
     mat <- mat + mat2
   }
   
-  if(!is.null(colnames(df)[1]) & !is.null(colnames(df)[2])) names(dimnames(mat)) <- colnames(df)[1:2]
+  if(!is.null(colnames(df)[1]) & !is.null(colnames(df)[2])) {
+      names(dimnames(mat)) <- colnames(df)[1:2]
+  } 
   
   return(mat)
 }
